@@ -12,7 +12,7 @@ import re
 import time
 import pandas as pd
 
-
+# Function for making sure that the website has loaded before continuing
 def wait_for_page_load():
     timer = 10
     start_time = time.time()
@@ -23,29 +23,31 @@ def wait_for_page_load():
         if time.time() - start_time > timer:
             raise Exception('Timeout :(')
 
-
+# Defining the Webdriver to use
 Browser = webdriver.Chrome()
 
+# Definging the website to scrap
 Browser.get("https://gpex.com.au/connect/training-regions/flinders-mid-north/")
 
-
+# Text to search
 links = Browser.find_elements(By.CSS_SELECTOR, "div.practice_list ul li a")
 
+# init arrays
 hrefs = []
 names = []
 numberOfDoc = []
 
-
+# Assigning all the links to array
 for link in links:
     hrefs.append(link.get_attribute("href"))
     names.append(link.text)
 
-hrefs2 = {}
-
+# Searching through all the links for the information
 for href in hrefs:
-    hrefs2[href] = []
     Browser.get(href)
     wait_for_page_load()
+
+    # checking to make sure that the information is there
     try:
         no_docs = Browser.find_element(By.CLASS_NAME, "practice_number_of_doctors").get_attribute('innerHTML')
     except:
@@ -53,7 +55,9 @@ for href in hrefs:
         
     numberOfDoc.append(no_docs)
 
+# Closing the browser
 Browser.close()
 
+# Exporting the data to csv
 df = pd.DataFrame({"Name of Practice" : names, "Number of Doctors" : numberOfDoc})
 df.to_csv("flinders_mid_north.csv", index=False)
