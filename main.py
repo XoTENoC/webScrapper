@@ -26,7 +26,7 @@ def wait_for_page_load():
 
 Browser = webdriver.Chrome()
 
-Browser.get("https://gpex.com.au/connect/training-regions/adelaide-metro/")
+Browser.get("https://gpex.com.au/connect/training-regions/flinders-mid-north/")
 
 
 links = Browser.find_elements(By.CSS_SELECTOR, "div.practice_list ul li a")
@@ -46,10 +46,14 @@ for href in hrefs:
     hrefs2[href] = []
     Browser.get(href)
     wait_for_page_load()
-    no_docs = Browser.find_element(By.CLASS_NAME, "practice_number_of_doctors").get_attribute('innerHTML')
+    try:
+        no_docs = Browser.find_element(By.CLASS_NAME, "practice_number_of_doctors").get_attribute('innerHTML')
+    except:
+        no_docs = "Number of doctors: 0"
+        
     numberOfDoc.append(no_docs)
 
 Browser.close()
 
 df = pd.DataFrame({"Name of Practice" : names, "Number of Doctors" : numberOfDoc})
-df.to_csv("Adelaide_inner_metro.csv", index=False)
+df.to_csv("flinders_mid_north.csv", index=False)
